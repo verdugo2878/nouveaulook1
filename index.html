@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NOUVEAU LOOK — Boutique</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <!-- petit logo minimal -->
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2l3 6 6 .9-4.4 4.3 1 6L12 16.9 6.4 19.5l1-6L3 8.9 9 8z"/>
+            </svg>
+          </div>
+          <div class="name">NOUVEAU LOOK</div>
+          <div class="tag">Boutique vêtement </div>
+        </div>
+
+        <nav class="nav">
+          <a href="index.html">Accueil</a>
+          <a href="paiement.html">Paiement</a>
+          <a href="#footer">Contact</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Élégance moderne, Style premium.</h1>
+      <p>
+        Choisis ton produit, sélectionne ta taille et clique sur <strong>Acheter</strong>.
+        (Paiement)
+      </p>
+    </section>
+
+    <div class="toolbar">
+      <div class="title">Nos produits</div>
+      <div class="search">
+        <input id="searchInput" placeholder="Rechercher un produit..." />
+      </div>
+    </div>
+
+    <section class="grid" id="grid">
+      <!-- Injecté par app.js -->
+    </section>
+    <section class="panel" style="margin: 8px 0 22px;">
+  <h2>Logs & Données </h2>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+    <button class="btn" type="button" id="btnRefreshLogs">Rafraîchir</button>
+    <button class="btn" type="button" id="btnFirePixel">Déclencher pixel</button>
+    <button class="btn primary" type="button" id="btnReset">Reset données</button>
+  </div>
+
+  <div style="display:grid; gap:12px;">
+    <div>
+      <div style="font-weight:600; margin-bottom:6px;">Événements</div>
+      <div id="logsBox" style="border:1px solid var(--line); border-radius:12px; padding:10px; max-height:260px; overflow:auto; background:#fff;"></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+      <div>
+        <div style="font-weight:600; margin-bottom:6px;">Cookies</div>
+        <pre id="cookiesBox" style="border:1px solid var(--line); border-radius:12px; padding:10px; background:#fff; overflow:auto; margin:0;"></pre>
+      </div>
+      <div>
+        <div style="font-weight:600; margin-bottom:6px;">sessionStorage</div>
+        <pre id="storageBox" style="border:1px solid var(--line); border-radius:12px; padding:10px; background:#fff; overflow:auto; margin:0;"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">But : rendre visible ce que le site “enregistre” </div>
+</section> 
+
+  </main>
+
+  <!-- Footer e-commerce -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h3>NOUVEAU LOOK</h3>
+          <div style="color:var(--muted); font-size:13px; line-height:1.6;">
+            Boutique (projet). Style blanc & or, présentation élégante.
+          </div>
+        </div>
+
+        <div>
+          <h3>Shop</h3>
+          <div style="display:grid; gap:8px;">
+            <a href="#">Nouveautés</a>
+            <a href="#">Meilleures ventes</a>
+            <a href="#">Collections</a>
+          </div>
+        </div>
+
+        <div>
+          <h3>Aide</h3>
+          <div style="display:grid; gap:8px;">
+            <a href="#">Livraison</a>
+            <a href="#">Retours</a>
+            <a href="#">FAQ</a>
+          </div>
+        </div>
+
+        <div>
+          <h3>Newsletter</h3>
+          <div style="color:var(--muted); font-size:13px; margin-bottom:10px;">
+            Reçois nos offres et nouveautés.
+          </div>
+          <div class="newsletter">
+            <input type="email" placeholder="Ton email" />
+            <button type="button" onclick="alert('✅ Inscription simulée (démo)')">S’inscrire</button>
+          </div>
+        </div>
+      </div>
+
+      <small>
+        © <span id="year"></span> NOUVEAU LOOK —  boutique. Tous droits réservés.
+      </small>
+    </div>
+  </footer>
+
+  <!-- Cookies (réapparaît à chaque refresh) -->
+  <div class="cookie" id="cookieBanner" style="display:none;">
+  <div class="cookie-inner">
+    <footer class="footer">
+  <p>
+    © 2026 <strong>Nouveau Look</strong> 
+    <a href="https://www.privacypolicies.com/live/d96913d4-7f25-4e6a-a859-5e0654ccd073" 
+       target="_blank" 
+       class="privacy-link">
+      Politique de confidentialité
+    </a>
+  </p>
+</footer>
+
+
+    <p>
+      Cookies. 
+      <strong>accepter des Terms & Conditions / politique de confidentialité</strong>.
+    </p>
+    <div class="cookie-actions">
+      <button class="btn" id="cookieRefuse" type="button">Refuser</button>
+      <button class="btn" id="cookieNecessary" type="button">Nécessaires</button>
+      <button class="btn primary" id="cookieAccept" type="button">Tout accepter</button>
+    </div>
+  </div>
+</div>
+<!-- LOGIN MODAL -->
+<!-- LOGIN / SIGNUP MODAL -->
+<div id="loginModal" class="modal hidden">
+  <div class="modal-card">
+    <h2 id="authTitle">Connexion</h2>
+    <p id="authSubtitle">Connectez-vous pour continuer vers l’achat.</p>
+
+    <label>Email ou nom d’utilisateur</label>
+    <input id="authIdentifier" type="text" placeholder="ex: user@nananinanana.com" />
+
+    <label>Mot de passe</label>
+    <input id="authPassword" type="password" placeholder="••••••••" />
+
+    <div class="row">
+      <button id="authCancelBtn" type="button">Annuler</button>
+      <button id="authSubmitBtn" type="button">Se connecter</button>
+    </div>
+
+    <div class="row" style="justify-content:space-between;">
+      <small class="hint">Si vous n'avez pas de compte?</small>
+      <button id="authToggleBtn" type="button" class="btn" style="width:auto;">Créer un compte</button>
+    </div>
+  </div>
+</div>
+
+<section class="debug">
+  <h3>Événements enregistrés (local)</h3>
+  <pre id="logsPanel"></pre>
+</section>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

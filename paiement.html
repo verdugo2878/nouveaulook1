@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paiement — NOUVEAU LOOK</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2l3 6 6 .9-4.4 4.3 1 6L12 16.9 6.4 19.5l1-6L3 8.9 9 8z"/>
+            </svg>
+          </div>
+          <div class="name">NOUVEAU LOOK</div>
+          <div class="tag">Paiement </div>
+        </div>
+
+        <nav class="nav">
+          <a href="index.html">← Retour boutique</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="pay">
+      <div class="panel">
+        <h2>Résumé</h2>
+        <div id="productSummary"></div>
+        <div class="total">
+          <span>Total</span>
+          <span id="total">$0</span>
+        </div>
+        <div class="note"> aucune transaction réelle.</div>
+      </div>
+
+      <div class="panel">
+        <h2>Informations</h2>
+        <form id="payForm">
+          <div class="field">
+            <label>Nom complet</label>
+            <input required placeholder="Ex: madara uchiwa" />
+          </div>
+
+          <div class="field">
+            <label>Email</label>
+            <input type="email" required placeholder="uchiwa@mail.com" />
+          </div>
+
+          <div class="field">
+            <label>Adresse</label>
+            <input required placeholder="Rue, Ville, Code postal" />
+          </div>
+
+          <div class="field">
+            <label>Moyen de paiement</label>
+            <select required>
+              <option>Carte </option>
+              <option>PayPal </option>
+            </select>
+          </div>
+
+          <button class="btn primary" type="submit" style="width:100%;">Payer </button>
+          <div class="note">Après validation : retour à la boutique.</div>
+        </form>
+      </div>
+    </section>
+    <section class="panel" style="margin: 8px 0 22px;">
+  <h2>Logs & Données </h2>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+    <button class="btn" type="button" id="btnRefreshLogs">Rafraîchir</button>
+    <button class="btn" type="button" id="btnFirePixel">Déclencher pixel</button>
+    <button class="btn primary" type="button" id="btnReset">Reset données</button>
+  </div>
+
+  <div style="display:grid; gap:12px;">
+    <div>
+      <div style="font-weight:600; margin-bottom:6px;">Événements</div>
+      <div id="logsBox" style="border:1px solid var(--line); border-radius:12px; padding:10px; max-height:260px; overflow:auto; background:#fff;"></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+      <div>
+        <div style="font-weight:600; margin-bottom:6px;">Cookies</div>
+        <pre id="cookiesBox" style="border:1px solid var(--line); border-radius:12px; padding:10px; background:#fff; overflow:auto; margin:0;"></pre>
+      </div>
+      <div>
+        <div style="font-weight:600; margin-bottom:6px;">sessionStorage</div>
+        <pre id="storageBox" style="border:1px solid var(--line); border-radius:12px; padding:10px; background:#fff; overflow:auto; margin:0;"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">But : rendre visible ce que le site “enregistre”.</div>
+</section>
+
+  </main>
+
+  <!-- Cookies (réapparaît à chaque refresh) -->
+  <div class="cookie" id="cookieBanner" style="display:none;">
+  <div class="cookie-inner">
+    <p>
+      Cookies (démo). Choisis une option :
+      <strong>La bannière réapparaît à chaque rafraîchissement</strong>.
+    </p>
+    <div class="cookie-actions">
+      <button class="btn" id="cookieRefuse" type="button">Refuser</button>
+      <button class="btn" id="cookieNecessary" type="button">Nécessaires</button>
+      <button class="btn primary" id="cookieAccept" type="button">Tout accepter</button>
+    </div>
+  </div>
+</div>
+
+
+  <script src="app.js"></script>
+</body>
+</html>
