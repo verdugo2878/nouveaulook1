@@ -57,6 +57,7 @@
     <button class="btn" type="button" id="btnRefreshLogs">Rafraîchir</button>
     <button class="btn" type="button" id="btnFirePixel">Déclencher pixel</button>
     <button class="btn primary" type="button" id="btnReset">Reset données</button>
+    <button class="btn" type="button" id="btnBaseState">Revenir à l’état de base</button>
   </div>
 
   <div style="display:grid; gap:12px;">
@@ -75,13 +76,27 @@
         <pre id="storageBox" style="border:1px solid var(--line); border-radius:12px; padding:10px; background:#fff; overflow:auto; margin:0;"></pre>
       </div>
     </div>
+    <div style="margin-top:12px;">
+  <div style="font-weight:600; margin-bottom:6px;">
+    localStorage (mémoire persistante)
   </div>
 
+  <pre
+    id="localStorageBox"
+    style="
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      background:#fff;
+      overflow:auto;
+      margin:0;
+    "
+  ></pre>
+</div>
+  </div>
   <div class="note">But : rendre visible ce que le site “enregistre” </div>
 </section> 
-
   </main>
-
   <!-- Footer e-commerce -->
   <footer class="footer" id="footer">
     <div class="container">
@@ -92,7 +107,6 @@
             Boutique (projet). Style blanc & or, présentation élégante.
           </div>
         </div>
-
         <div>
           <h3>Shop</h3>
           <div style="display:grid; gap:8px;">
@@ -101,7 +115,6 @@
             <a href="#">Collections</a>
           </div>
         </div>
-
         <div>
           <h3>Aide</h3>
           <div style="display:grid; gap:8px;">
@@ -110,7 +123,6 @@
             <a href="#">FAQ</a>
           </div>
         </div>
-
         <div>
           <h3>Newsletter</h3>
           <div style="color:var(--muted); font-size:13px; margin-bottom:10px;">
@@ -129,7 +141,7 @@
     </div>
   </footer>
 
-  <!-- Cookies (réapparaît à chaque refresh) -->
+  <!-- Cookies (le choix est mémorisé : la bannière ne revient pas au refresh sauf si on réinitialise) -->
   <div class="cookie" id="cookieBanner" style="display:none;">
   <div class="cookie-inner">
     <footer class="footer">
@@ -182,7 +194,7 @@
 
 <section class="debug">
   <h3>Événements enregistrés (local)</h3>
-  <pre id="logsPanel"></pre>
+  <pre id="sessionStorageBox"></pre>
 </section>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
