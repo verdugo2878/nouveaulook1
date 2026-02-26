@@ -1,0 +1,54 @@
+### Projet pratique numéro 1
+---
+Axelle combe, 
+Alicia Humblot et
+Guy Landry Kuedjeu Madeo
+
+## introduction
+
+Pour ce projet, nous avions pour but de concevoir une application web didactique permettant de visualiser l’évolution des données stockées dans le navigateur (cookies, localStorage) selon le niveau de consentement accordé par l’utilisateur.
+
+Le projet sert donc à mettre en évidence : quelles sont les données collectées lors d’une interaction avec le site, le mécanisme de persistance de ces données et le réel impact du choix de confidentialité sur la récolte de ces données.
+
+## Les cookies
+
+Mais tout d’abord, sous quelle forme sont récoltées ces données ? Ici, on parle de cookies. Un cookie est un petit fichier texte qui contient des informations sur l’utilisateur dans le but d'améliorer son expérience. Cela permet notamment de personnaliser l’interface, de mémoriser les préférences de langue, de garder en mémoire un panier d'achat, une adresse de livraison et de faciliter une reconnexion. Néanmoins, ces mêmes cookies peuvent aussi servir à obtenir des informations sur l’utilisateur dans le but de les revendre ou de vous proposer directement des produits que vous êtes plus susceptible d'acheter.
+
+| Catégorie | Utilité principale | Exemples | Niveau d'intrusion | Consentement |
+| :--- | :--- | :--- | :--- | :--- |
+| **Essentiels** | Assurent le fonctionnement de base du site : maintien du panier, connexion au compte, sécurité (fraude, bots), choix de langue/devise. | Identifiant de session (ID unique), Adresse IP (sécurité), Données de connexion, Jeton de sécurité (anti-CSRF), Choix langue/devise. | Faible | Non requis |
+| **Performances** | Mesurent l'utilisation du site pour l'améliorer : pages visitées, temps passé, erreurs rencontrées, taux d'abandon du panier. | Adresse IP (anonymisée), Type d'appareil/navigateur, Pages consultées, Temps passé sur une page, Provenance du trafic (Google, Instagram). | Moyen | Requis |
+| **Fonctionnalités** | Améliorent le confort et la personnalisation : mémoriser la taille préférée, sauvegarder les favoris, pré-remplir l'adresse de livraison, historique des produits consultés. | Historique de navigation (recommandations), Taille sélectionnée, Liste de favoris, Adresse sauvegardée (gain de temps au checkout), Préférences (couleurs, marques). | Moyen à élevé | Requis |
+| **Publicitaires** | Proposent des publicités ciblées : remarketing sur les réseaux sociaux, offres personnalisées par email, publicités basées sur les produits vus. | Adresse IP complète (ciblage géo), Historique de produits vus (remarketing), Données de navigation multi-sites, Identifiant publicitaire unique, Email haché. | Élevé | Requis (clair et explicite) |
+
+## La Loi 25
+
+La Loi 25, Loi Modernisant des dispositions législatives en matière de protection des renseignements personnels, adoptée en 2021 par l’Assemblée nationale du Québec constitue une nouvelle réforme majeure du cadre juridique québécois pour la protection des renseignements personnels. 
+
+L’objectif principal de la Loi 25 est de moderniser les règles face à l’évolution technologique, renforcer la transparence des organisations, accroître le contrôle des citoyens sur leurs données et responsabiliser davantage les entreprises et organismes publics. 
+
+Dans ce but, la loi modifie principalement deux lois: la loi sur l’accès aux documents des organismes publics et sur la protection des renseignements personnels, et la loi sur la protection des renseignements personnels dans le secteur privé. Cependant, même si la Loi 25 a vu le jour en 2021, elle est seulement entrée en vigueur progressivement entre 2022 et 2024. 
+
+Ainsi la Loi 25 impose plusieurs nouvelles obligations:
+Gouvernance des données (pour les organisations) → désigner un responsable de la protection des renseignements personnels, adopter des  politiques internes de gouvernance et publier ces politiques de manière accessible. 
+Évaluation des facteurs relatifs à la vie privée (EFVP) → tout projet d’acquisition ou de développement de système impliquant des renseignements personnels et tout transfert de données à l’extérieur du Québec. 
+Consentement renforcé → libre, éclairé, spécifique et présenté distinctement de toute autre information (pour les personnes de moins de 14 ans, le consentement du titulaire de l’autorité parentale est requis).
+Nouveaux droits des citoyens → droit à la portabilité des données, droit à l’effacement (droit à l’oubli), droit d’être informé en cas de décision automatisée et obligation pour l’organisation de signaler toute fuite de données. 
+Sanctions importantes → des sanctions administratives pouvant atteindre 10M$ ou 2% du chiffre d’affaires mondial et des sanctions pénales pouvant atteindre 25M$ ou 4% du chiffre d’affaires mondial. 
+
+Grâce à cette nouvelle loi, le Québec se positionne comme un leader nord-américain en matière de protection des données.  
+
+## installation 
+
+Pour l'installation c'est simple il suffit de télécharger le code depuis le dépot git-hub : https://github.com/verdugo2878/nouveaulook1
+Puis il suffit d'ouvrir le fichier index.html dans le navigateur de votre choix
+
+https://verdugo2878.github.io/nouveaulook1/ sinon ce lien vous ouvrira directement le site sur votre navigateur
+
+## Différent cas
+
+Pour le projet nous avons coder une application de vente de vêtements en ligne le but est de juste montrer commment les informations sont collectées.
+On a donc sur le site un bandeau pour accepter tous les cookies, accepter seulement les cookies essentiels et refuser tous les cookies. 
+on a deux cas différents en vérité:
+    - lorsque l'utilisateur refuse ou accepte uniquement les cookies essentiels, c'est le même cas puisque comme dit précedemment on n'a pas besoin du consentement de l'utilisateur. Ici le cas d'utilisation est clair, les logs vont juste collecter le fait que l'utilisateur interragit avec un produit, ce qui va être mis dans les logs visibles à l'écran;
+    - lorsque l'utilisateur accepte tous les cookies, on va chercher à enregistrer l'adresse de connexion: quand on appuie sur acheter un vêtement, ça va demander la connexion de l'utilisateur et donc une adresse mail. Si l'utilisateur rentre une adresse, cela va l'enristrer et alors même si la page est rechargée, l'adresse rentrée par l'utilisateur sera conservée.
