@@ -311,8 +311,7 @@ input:focus, select:focus{ border-color: rgba(184,138,42,0.55); }
   font-size: 12px;
   margin-top: 8px;
 }
-
-/* Cookie banner (apparaît à chaque refresh) */
+/* Cookie banner (n’apparaît plus au refresh si un choix de consentement est enregistré) */
 .cookie{
   position: fixed;
   left: 0;

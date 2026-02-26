@@ -85,6 +85,17 @@ function renderDebugPanels() {
     }
     sBox.textContent = JSON.stringify(dump, null, 2) || "{}";
   }
+    // ✅ localStorage dump (utile pour mémoire paiement)
+  const lBox = document.querySelector("#localStorageBox");
+  if (lBox) {
+    const dump = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      dump[k] = localStorage.getItem(k);
+    }
+    lBox.textContent = JSON.stringify(dump, null, 2) || "{}";
+  }
+
 }
 
 function escapeHtml(s){
@@ -96,13 +107,10 @@ function escapeHtml(s){
     .replaceAll("'","&#039;");
 }
 
+// 3) Cookies / Consent (persistant + bouton état de base)
 // =======================
-// 3) Cookies / Consent (réapparaît à chaque refresh)
-// =======================
-// On ne mémorise PAS le choix => la bannière revient au refresh.
-// Mais on garde le choix dans sessionStorage tant que l'onglet reste ouvert,
-// pour que la page puisse appliquer des comportements après le clic.
-const CONSENT_KEY = "nl_consent"; // sessionStorage
+const CONSENT_COOKIE = "nl_consent_choice"; // cookie persistant
+const CONSENT_LS_KEY = "nl_consent_choice_ls";
 const CONSENT = {
   REFUSED: "refused",
   NECESSARY: "necessary",
@@ -111,12 +119,29 @@ const CONSENT = {
 
 function setCookie(name, value, days = 7) {
   const d = new Date();
-  d.setTime(d.getTime() + days*24*60*60*1000);
+  d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
   document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; expires=${d.toUTCString()}; path=/`;
 }
 
+// ✅ Cookie de SESSION (pas d'expires)
+function setSessionCookie(name, value) {
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; path=/`;
+}
+
+function getCookie(name) {
+  const n = encodeURIComponent(name) + "=";
+  const parts = document.cookie.split(";").map(x => x.trim());
+  for (const p of parts) {
+    if (p.startsWith(n)) return decodeURIComponent(p.slice(n.length));
+  }
+  return null;
+}
+
+function deleteCookie(name) {
+  document.cookie = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+}
+
 function deleteAllCookies() {
-  // efface tous les cookies accessibles via JS sur le path
   const cookies = document.cookie.split(";").map(c => c.trim()).filter(Boolean);
   for (const c of cookies) {
     const eqPos = c.indexOf("=");
@@ -125,33 +150,84 @@ function deleteAllCookies() {
   }
 }
 
-function applyConsent(choice) {
-  sessionStorage.setItem(CONSENT_KEY, choice);
+function cryptoId() {
+  return (crypto?.randomUUID?.() || Math.random().toString(16).slice(2) + Date.now().toString(16));
+}
 
-  // comportement "démo" :
-  // - necessary : session_id
-  // - all : session_id + ad_id + last_seen
-  // - refused : ne crée pas de cookies de tracking (et peut aussi ne rien créer)
+// ✅ Consent actuel (persisté en cookie)
+function getConsent() {
+  return getCookie(CONSENT_COOKIE) || localStorage.getItem(CONSENT_LS_KEY) || "unknown";
+}
+
+// ✅ Revenir à l'état de base (comme si l'utilisateur n'a rien choisi)
+function resetToBaseState() {
+
+  // ✅ 1) Supprimer TOUS les cookies
+  deleteAllCookies();
+
+  // ✅ 2) Supprimer tous les stockages persistants
+  localStorage.clear();
+  sessionStorage.clear();
+
+  // ✅ 3) Réafficher la bannière
+  const banner = document.querySelector("#cookieBanner");
+  if (banner) banner.style.display = "block";
+
+  logEvent("base_state_restored", {
+    cookies: "all_deleted",
+    storage: "all_cleared"
+  });
+
+  renderDebugPanels();
+}
+
+function applyConsent(choice) {
+  // ✅ persister le choix (pour ne pas réafficher au refresh)
+  setCookie(CONSENT_COOKIE, choice, 180);
+  localStorage.setItem(CONSENT_LS_KEY, choice);
+  // ✅ Si l'utilisateur accepte TOUT après avoir déjà tapé l'email, on le garde
+if (choice === CONSENT.ALL) {
+  const input = document.getElementById("authIdentifier");
+  if (input?.value) localStorage.setItem(LAST_IDENTIFIER_KEY, input.value);
+} else {
+  // Sinon on supprime
+  localStorage.removeItem(LAST_IDENTIFIER_KEY);
+}
+  // ✅ Dans TOUS les cas : créer cookie de session
+  const sid = cryptoId();
+  setSessionCookie("session_id", sid);
+
   if (choice === CONSENT.NECESSARY) {
-    setCookie("session_id", cryptoId());
-    logEvent("consent_necessary", { created: ["session_id"] });
+    logEvent("consent_necessary", { created: ["session_id"], session_id: sid });
   } else if (choice === CONSENT.ALL) {
-    setCookie("session_id", cryptoId());
-    setCookie("ad_id", cryptoId());
-    setCookie("last_seen", new Date().toISOString());
-    logEvent("consent_all", { created: ["session_id", "ad_id", "last_seen"] });
+    // tracking (démo)
+    const ad = cryptoId();
+    const seen = new Date().toISOString();
+    setCookie("ad_id", ad, 30);
+    setCookie("last_seen", seen, 30);
+    logEvent("consent_all", { created: ["session_id", "ad_id", "last_seen"], session_id: sid, ad_id: ad, last_seen: seen });
   } else {
-    logEvent("consent_refused", { created: [] });
+    // refused => session cookie ONLY
+    logEvent("consent_refused", { created: ["session_id"], session_id: sid });
   }
 
   renderDebugPanels();
 }
 
-function initCookieBannerAlways() {
+function initCookieBanner() {
   const banner = document.querySelector("#cookieBanner");
   if (!banner) return;
 
-  // Toujours afficher au chargement (exigence)
+  const existing = getConsent();
+
+  // ✅ Si déjà choisi, on ne montre plus la bannière au refresh
+  if (existing !== "unknown") {
+    banner.style.display = "none";
+    logEvent("cookie_banner_skipped", { page: location.pathname, consent: existing });
+    return;
+  }
+
+  // sinon afficher
   banner.style.display = "block";
   logEvent("cookie_banner_shown", { page: location.pathname });
 
@@ -166,14 +242,6 @@ function initCookieBannerAlways() {
   btnAccept?.addEventListener("click", () => { applyConsent(CONSENT.ALL); close(); });
 }
 
-function getConsent() {
-  return sessionStorage.getItem(CONSENT_KEY) || "unknown";
-}
-
-function cryptoId(){
-  // ID pseudo-aléatoire (démo)
-  return (crypto?.randomUUID?.() || Math.random().toString(16).slice(2) + Date.now().toString(16));
-}
 
 // =======================
 // 4) Pixel simulé (local)
@@ -275,6 +343,31 @@ function initSearch(){
 // =======================
 function initPayment(){
   const summary = document.querySelector("#productSummary");
+  // =======================
+// ✅ Paiement : garder "Nom complet" après refresh si consent = ALL
+// =======================
+const PAY_NAME_KEY = "nl_pay_name";
+
+const nameInput = document.querySelector("#payName");
+if (nameInput) {
+  // Restaurer au chargement
+  if (getConsent() === "all") {
+    const savedName = localStorage.getItem(PAY_NAME_KEY);
+    if (savedName) nameInput.value = savedName;
+  } else {
+    // si pas ALL, on ne garde rien
+    localStorage.removeItem(PAY_NAME_KEY);
+  }
+
+  // Sauvegarder à chaque frappe
+  nameInput.addEventListener("input", () => {
+    if (getConsent() === "all") {
+      localStorage.setItem(PAY_NAME_KEY, nameInput.value);
+    } else {
+      localStorage.removeItem(PAY_NAME_KEY);
+    }
+  });
+}
   if (!summary) return;
 
   const params = new URLSearchParams(window.location.search);
@@ -302,12 +395,54 @@ function initPayment(){
   logEvent("payment_page_loaded", { id: product.id, size, price: product.price });
 
   const form = document.querySelector("#payForm");
+  // ✅ Mémoriser l'email pendant la session (survit au refresh)
+//const emailInput = document.querySelector("#payEmail");
+//const savedEmail = sessionStorage.getItem("nl_last_email");
+
+//if (savedEmail && emailInput) {
+//  emailInput.value = savedEmail;
+//}
+//emailInput?.addEventListener("input", () => {
+//  sessionStorage.setItem("nl_last_email", emailInput.value);
+//});
   form?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    logEvent("payment_submit_demo", { id: product.id, size, price: product.price });
-    alert("✅ Paiement simulé (démo) — merci !");
-    window.location.href = "index.html";
-  });
+  e.preventDefault();
+
+  const fullName = document.querySelector("#payName")?.value || "";
+  const email = document.querySelector("#payEmail")?.value || "";
+  const address = document.querySelector("#payAddress")?.value || "";
+  const method = document.querySelector("#payMethod")?.value || "";
+
+  logEvent("payment_submit_demo", { id: product.id, size, price: product.price });
+
+  // ✅ Si consent ALL, on garde en mémoire les données paiement (démo)
+  if (getConsent() === "all") {
+    const payload = {
+      productId: product.id,
+      size,
+      price: product.price,
+      fullName,
+      email,
+      address,
+      method,
+      savedAt: new Date().toISOString()
+    };
+    localStorage.setItem("nl_payment_memory", JSON.stringify(payload));
+
+    logEvent("payment_data_saved", {
+      where: "localStorage",
+      key: "nl_payment_memory",
+      fields: ["fullName", "email", "address", "method", "productId", "size", "price"]
+    });
+  } else {
+    logEvent("payment_data_not_saved", { reason: "consent_not_all", consent: getConsent() });
+  }
+
+  renderDebugPanels();
+  alert("✅ Paiement simulé (démo) — merci !");
+  window.location.href = "index.html";
+});
+
 }
 
 // =======================
@@ -336,6 +471,12 @@ function initDebugButtons(){
     renderDebugPanels();
     alert("✅ Données locales reset (cookies + sessionStorage).");
   });
+    const btnBase = document.querySelector("#btnBaseState");
+  btnBase?.addEventListener("click", () => {
+    resetToBaseState();
+    alert("✅ Retour à l’état de base (consentement + cookies + mémoire paiement).");
+  });
+
 }
 
 // =======================
@@ -344,10 +485,8 @@ function initDebugButtons(){
 document.addEventListener("DOMContentLoaded", () => {
   // log visite
   logEvent("page_view", { page: location.pathname });
-
-  // cookie banner (toujours)
-  initCookieBannerAlways();
-
+  initCookieBanner();
+  rememberAuthIdentifier();
   // pixel auto au chargement (démo)
   fireTrackingPixel("auto");
 
@@ -394,7 +533,26 @@ document.getElementById("authToggleBtn")?.addEventListener("click", () => {
 const USERS_KEY = "nl_users";          // comptes persistants
 const SESSION_KEY = "nl_session";      // session (onglet)
 const PENDING_KEY = "nl_pending_checkout"; // achat en attente
+const LAST_IDENTIFIER_KEY = "nl_last_identifier";
+function initRememberIdentifierIfConsentAll(){
+  const input = document.getElementById("authIdentifier");
+  if (!input) return;
 
+  // ✅ Au chargement : restaurer si consent ALL
+  if (getConsent() === "all") {
+    const saved = localStorage.getItem(LAST_IDENTIFIER_KEY);
+    if (saved) input.value = saved;
+  }
+
+  // ✅ À chaque frappe : mémoriser si consent ALL, sinon ne rien garder
+  input.addEventListener("input", () => {
+    if (getConsent() === "all") {
+      localStorage.setItem(LAST_IDENTIFIER_KEY, input.value);
+    } else {
+      localStorage.removeItem(LAST_IDENTIFIER_KEY);
+    }
+  });
+}
 function getUsers(){
   try { return JSON.parse(localStorage.getItem(USERS_KEY) || "[]"); }
   catch { return []; }
@@ -545,4 +703,29 @@ function continuePendingCheckout(){
 function goToPayment(productId, size){
   logEvent("checkout_start", { id: productId, size });
   window.location.href = `paiement.html?id=${encodeURIComponent(productId)}&size=${encodeURIComponent(size)}`;
+}
+function rememberAuthIdentifier(){
+  const input = document.getElementById("authIdentifier");
+  if (!input) return;
+
+  const consent = getConsent();
+
+  // ✅ restaurer uniquement si ALL
+  if (consent === "all") {
+    const saved = localStorage.getItem(LAST_IDENTIFIER_KEY);
+    if (saved) input.value = saved;
+  }
+
+  // ✅ sauvegarder uniquement si ALL
+  input.addEventListener("input", () => {
+    const c = getConsent();
+    if (c === "all") {
+      localStorage.setItem(LAST_IDENTIFIER_KEY, input.value);
+    }
+    // ⚠️ si c'est "unknown", on ne touche à rien
+    // ✅ si c'est refused/necessary, on supprime
+    else if (c !== "unknown") {
+      localStorage.removeItem(LAST_IDENTIFIER_KEY);
+    }
+  });
 }

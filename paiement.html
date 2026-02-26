@@ -45,25 +45,34 @@
         <form id="payForm">
           <div class="field">
             <label>Nom complet</label>
-            <input required placeholder="Ex: madara uchiwa" />
+            <input id="payName"
+       required
+       name="name"
+       autocomplete="name"
+       placeholder="Ex: madara uchiwa" />
           </div>
 
           <div class="field">
             <label>Email</label>
-            <input type="email" required placeholder="uchiwa@mail.com" />
+            <input id="payEmail"
+       type="email"
+       required
+       name="email"
+       autocomplete="email"
+       placeholder="uchiwa@mail.com" />
           </div>
 
           <div class="field">
             <label>Adresse</label>
-            <input required placeholder="Rue, Ville, Code postal" />
+            <input id="payAddress" required placeholder="Rue, Ville, Code postal" />
           </div>
 
           <div class="field">
             <label>Moyen de paiement</label>
-            <select required>
-              <option>Carte </option>
-              <option>PayPal </option>
-            </select>
+            <select id="payMethod" required>
+  <option>Carte</option>
+  <option>PayPal</option>
+</select>
           </div>
 
           <button class="btn primary" type="submit" style="width:100%;">Payer </button>
@@ -78,6 +87,7 @@
     <button class="btn" type="button" id="btnRefreshLogs">Rafraîchir</button>
     <button class="btn" type="button" id="btnFirePixel">Déclencher pixel</button>
     <button class="btn primary" type="button" id="btnReset">Reset données</button>
+    <button class="btn" type="button" id="btnBaseState">Revenir à l’état de base</button>
   </div>
 
   <div style="display:grid; gap:12px;">
@@ -103,12 +113,12 @@
 
   </main>
 
-  <!-- Cookies (réapparaît à chaque refresh) -->
+ <!-- Cookies (le choix est mémorisé : la bannière ne revient pas au refresh sauf si on réinitialise) -->
   <div class="cookie" id="cookieBanner" style="display:none;">
   <div class="cookie-inner">
     <p>
       Cookies (démo). Choisis une option :
-      <strong>La bannière réapparaît à chaque rafraîchissement</strong>.
+      <strong>Votre choix est enregistré : la bannière ne réapparaît pas au rafraîchissement.</strong>
     </p>
     <div class="cookie-actions">
       <button class="btn" id="cookieRefuse" type="button">Refuser</button>
